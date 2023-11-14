@@ -8,8 +8,12 @@ import {
     Row
 } from "react-bootstrap";
 
+// Import Apollo GraphQL
+import { useMutation } from "@apollo/client";
+import { SAVE_BOOK } from "../utils/mutations";
+
 import Auth from "../utils/auth";
-import { saveBook, searchGoogleBooks } from "../utils/API";
+import { searchGoogleBooks } from "../utils/API";
 import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
 
 const SearchBooks = () => {
@@ -26,6 +30,9 @@ const SearchBooks = () => {
     useEffect(() => {
         return () => saveBookIds(savedBookIds);
     });
+
+    // Define save book mutation
+    const [saveBook] = useMutation(SAVE_BOOK);
 
     // Creates method to search for books and sets state on form submit
     const handleFormSubmit = async (event) => {
@@ -72,10 +79,13 @@ const SearchBooks = () => {
         }
 
         try {
-            const response = await saveBook(bookToSave, token);
+            // Save book to database
+            const { data } = await saveBook({
+                variables: { bookData: { ...bookToSave } }
+            });
 
-            if (!response.ok) {
-                throw new Error("Something went wrong!");
+            if (!data) {
+                throw new Error("Can't find data!");
             }
 
             // If book successfully saves to user's account, save book id to state
@@ -124,18 +134,33 @@ const SearchBooks = () => {
                             <Col md="4" key={book.bookId}>
                                 <Card border="dark">
                                     {book.image ? (
-                                        <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant="top" />
+                                        <Card.Img
+                                            src={book.image}
+                                            alt={`The cover for ${book.title}`}
+                                            variant="top"
+                                        />
                                     ) : null}
                                     <Card.Body>
                                         <Card.Title>{book.title}</Card.Title>
                                         <p className="small">Authors: {book.authors}</p>
-                                        <Card.Text>{book.description}</Card.Text>
+                                        <Card.Text>
+                                            {book.description}
+                                            <br />
+                                            <a href={book.link} target="_blank" rel="noreferrer">
+                                                Preview on Google Books
+                                            </a>
+                                        </Card.Text>
                                         {Auth.loggedIn() && (
                                             <Button
-                                                disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
+                                                disabled={savedBookIds?.some(
+                                                    (savedBookId) => savedBookId === book.bookId
+                                                )}
                                                 className="btn-block btn-info"
-                                                onClick={() => handleSaveBook(book.bookId)}>
-                                                {savedBookIds?.some((savedBookId) => savedBookId === book.bookId)
+                                                onClick={() => handleSaveBook(book.bookId)}
+                                            >
+                                                {savedBookIds?.some(
+                                                    (savedBookId) => savedBookId === book.bookId
+                                                )
                                                     ? "This book has already been saved!"
                                                     : "Save this book!"}
                                             </Button>
