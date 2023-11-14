@@ -97,7 +97,7 @@ const SavedBooks = () => {
                                     </Card.Body>
                                 </Card>
                             </Col>
-                        
+                        // )
                     ))}
                 </Row>
             </Container>
