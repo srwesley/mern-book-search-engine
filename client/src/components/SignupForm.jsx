@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 
-import { createUser } from "../utils/API";
+// import { createUser } from "../utils/API";
 import Auth from "../utils/auth";
+
+// Add Apollo GraphQL
+import { useMutation } from "@apollo/client";
+import { ADD_USER } from "../utils/mutations";
 
 const SignupForm = () => {
     // Sets the initial form state
@@ -11,6 +15,9 @@ const SignupForm = () => {
     const [validated] = useState(false);
     // Sets state for alert
     const [showAlert, setShowAlert] = useState(false);
+
+    // Add addUser mutation
+    const [addUser] = useMutation(ADD_USER);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -27,14 +34,21 @@ const SignupForm = () => {
             event.stopPropagation();
         }
 
+        // try {
+        //     const response = await createUser(userFormData);
+
+        //     if (!response.ok) {
+        //         throw new Error("Something went wrong!");
+        //     }
+
+
         try {
-            const response = await createUser(userFormData);
+            // Call addUser mutation
+            const { data } = await addUser({
+                variables: { ...userFormData },
+            });
 
-            if (!response.ok) {
-                throw new Error("Something went wrong!");
-            }
-
-            const { token, user } = await response.json();
+            const { token, user } = data.addUser;
             console.log(user);
             Auth.login(token);
         } catch (err) {
@@ -100,7 +114,7 @@ const SignupForm = () => {
                     disabled={!(userFormData.username && userFormData.email && userFormData.password)}
                     type="submit"
                     variant="success">
-                        Submit
+                    Submit
                 </Button>
             </Form>
         </>
