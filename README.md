@@ -2,7 +2,7 @@
 Assignment for Week 21 - MERN for bootcamp.
 
 ## Task
-This assignment was to create a fullstack web application using a fully function Google Books API search engine built into it with a RESTful API, and then to refactor it to be a GraphQL API built with an Apollo Server. This app was to be built using the MERN stack - so with a React front end, MongoDB database, and Node.js/Express.js server and API.
+This assignment was to create a fullstack web application using a fully function Google Books API search engine built into it with a RESTful API, and then to refactor it to be a GraphQL API built with an Apollo Server. This app was to be built using the MERN stack - so with a React front end, MongoDB database, and Node.js/Express.js server and API. This application is supposed to allow users to search up books, and also to save searched books, but only once they either sign up or log in.
 
 Albeit there being starter code, my responsibilities were, as mentioned above, refactor the existing code to using GraphQL API and the Apollo Server. So for the back end/`server` directory, I had to work with both the `auth.js` and `server.js` files to implement the appropriate middleware. I also had to add in a `Schemas` directory with an `index.js`, a `resolvers.js`, and a `typeDefs.js` file, which the last had to include `Query` and `Mutation` types.
 
