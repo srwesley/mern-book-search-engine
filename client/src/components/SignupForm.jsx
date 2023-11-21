@@ -17,7 +17,7 @@ const SignupForm = () => {
     const [showAlert, setShowAlert] = useState(false);
 
     // Add addUser mutation
-    const [addUser] = useMutation(ADD_USER);
+    const [addUser, { Error }] = useMutation(ADD_USER);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -48,9 +48,11 @@ const SignupForm = () => {
                 variables: { ...userFormData },
             });
 
-            const { token, user } = data.addUser;
-            console.log(user);
-            Auth.login(token);
+            if (!data.addUser) {
+                throw new Error("Oops, something went wrong!");
+            }
+
+            Auth.login(data.addUser.token);
         } catch (err) {
             console.error(err);
             setShowAlert(true);
@@ -68,7 +70,12 @@ const SignupForm = () => {
             {/* This is needed for the validation functionality above */}
             <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
                 {/* Shows alert if server response is bad */}
-                <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant="danger">
+                <Alert
+                    dismissible
+                    onClose={() => setShowAlert(false)}
+                    show={showAlert}
+                    variant="danger"
+                >
                     Something went wrong with your signup!
                 </Alert>
 
@@ -113,7 +120,8 @@ const SignupForm = () => {
                 <Button
                     disabled={!(userFormData.username && userFormData.email && userFormData.password)}
                     type="submit"
-                    variant="success">
+                    variant="success"
+                >
                     Submit
                 </Button>
             </Form>
