@@ -13,13 +13,14 @@ const db = require("./config/connection");
 
 // const routes = require("./routes");
 
+const app = express();
 const PORT = process.env.PORT || 3001;
+
 const server = new ApolloServer({
     typeDefs,
     resolvers,
 });
 
-const app = express();
 
 // New instance of Apollo server with the GraphQL schema
 const startApolloServer = async () => {
