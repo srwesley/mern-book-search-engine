@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 
 // import { loginUser } from "../utils/API";
@@ -14,15 +14,8 @@ const LoginForm = () => {
     const [showAlert, setShowAlert] = useState(false);
 
     // Added login user mutation
-    const [loginUser, { error }] = useMutation(LOGIN_USER);
-    useEffect(() => {
-        if (error) {
-            setShowAlert(true);
-        } else {
-            setShowAlert(false);
-        }
-    }, [error]);
-
+    const [login, { Error }] = useMutation(LOGIN_USER);
+    
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setUserFormData({ ...userFormData, [name]: value });
@@ -40,13 +33,15 @@ const LoginForm = () => {
 
         try {
             // Call login mutation
-            const { data } = await loginUser({
+            const { data } = await login({
                 variables: { ...userFormData },
             });
 
-            const { token, user } = data.login;
-            console.log(user);
-            Auth.login(token);
+            if (!data.login) {
+                throw new Error("Oops, something went wrong!");
+            }
+
+            Auth.login(data.login.token);
         } catch (err) {
             console.error(err);
             setShowAlert(true);
@@ -62,7 +57,12 @@ const LoginForm = () => {
     return (
         <>
             <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-                <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant="danger">
+                <Alert
+                    dismissible
+                    onClose={() => setShowAlert(false)}
+                    show={showAlert}
+                    variant="danger"
+                >
                     Something went wrong with your login credentials!
                 </Alert>
                 <Form.Group className="mb-3">
@@ -93,8 +93,9 @@ const LoginForm = () => {
                 <Button
                     disabled={!(userFormData.email && userFormData.password)}
                     type="submit"
-                    variant="success">
-                        Submit
+                    variant="success"
+                >
+                    Submit
                 </Button>
             </Form>
         </>
